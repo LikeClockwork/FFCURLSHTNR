@@ -1,0 +1,63 @@
+extends layout
+
+block content
+  .container
+    .row
+      h1 FreeCodeCamp URL Shortener
+    .row#entryForm
+      h4.
+        Enter a valid URL, click submit, and I'll give you a 
+        shortened version of the URL.
+      h5 OR
+      h5 Do it the ugly way via a direct parameter by entering your request into the address bar with this format:
+      h5 https://fcc-url-shortener-likeclockwork.c9users.io/shorten/www.my-url-to-shorten.com
+      form#urlSubmit
+        .form-group
+          label(for= "urlEntry") Enter URL:
+          input.form-control#urlEntry( placeholder= "www.example.com" )
+        button.btn.btn-default( type= "submit" ) Shorten it!
+    .row#error(style="display:none")
+      h3 Shame on you!
+      h5 You entered:
+      h4#entered
+      h5 which is not a valid URL!
+      button.btn.btn-default.reset I want to try again!
+    .row#success(style="display:none")
+      h3 Awesome!
+      h5 Your URL:
+      h4#longURL
+      h5 has been shortened to:
+      h4#shortURL
+      button.btn.btn-default.reset I have the need to shorten further!
+      
+  include js.jade
+  
+  script.
+
+    $(document).ready( function () {
+        
+        $('#urlSubmit').submit( function (e) {
+            e.preventDefault();
+            $.getJSON('shorten/' + encodeURIComponent($('#urlEntry').val()), function (data) {
+              if(data.message == 'success') {
+                $('#longURL').html('<a target="_blank" href="' + data.long + '">' + data.long + '</a>');
+                $('#shortURL').html('<a target="_blank" href="' + window.location.href + data.short + '">' + window.location.href + data.short + '</a>');
+                $('#entryForm').slideUp();
+                $('#success').slideDown();
+              }  else {
+                $('#entered').html(data.entered);
+                $('#entryForm').slideUp();
+                $('#error').slideDown();       
+              }
+            
+            });
+        });
+        
+        $(".reset").click( function() {
+                $('#urlEntry').val('');
+                $('#error').slideUp();
+                $('#success').slideUp();              
+                $('#entryForm').slideDown();       
+        });
+        
+    });
